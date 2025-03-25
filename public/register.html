@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+  <meta charset="UTF-8">
+  <title>Εγγραφή Χρήστη</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #ffe6f0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-box {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 300px;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background: #e91e63;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="form-box">
+    <h2>Εγγραφή</h2>
+    <input type="text" id="username" placeholder="Όνομα χρήστη">
+    <input type="password" id="password" placeholder="Κωδικός">
+    <button onclick="register()">Εγγραφή</button>
+    <p><a href="login.html">Έχεις ήδη λογαριασμό; Σύνδεση</a></p>
+  </div>
+
+  <script>
+    async function register() {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+
+      const res = await fetch('/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+
+      const text = await res.text();
+      alert(text);
+      if (res.ok) {
+        localStorage.setItem('username', username);
+        window.location = '/index.html';
+      }
+    }
+  </script>
+</body>
+</html>
