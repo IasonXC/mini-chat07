@@ -2,29 +2,116 @@
 <html lang="el">
 <head>
   <meta charset="UTF-8">
-  <title>Albatros</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Albatros - Χρήστες</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      background-color: #ffc0cb; /* Ροζ background */
+      font-family: sans-serif;
+      background: #ffe6f0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #e91e63;
+    }
+
+    .section {
+      margin: 30px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 400px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    .user-item {
+      display: flex;
+      justify-content: space-between;
+      margin: 5px 0;
+    }
+
+    button {
+      background: #e91e63;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 6px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <div class="chat-wrapper">
-    <h1 class="chat-title">Albatros</h1>
+  <h1>🪽 Albatros Chat</h1>
 
-    <div class="chat-box" id="messages"></div>
-
-    <div class="input-group">
-      <input type="text" id="username" placeholder="Όνομα χρήστη" />
-      <input type="text" id="message" placeholder="Γράψε μήνυμα..." />
-      <button onclick="sendMessage()">Sent 📨</button>
-    </div>
+  <div class="section">
+    <h3>Άλλοι χρήστες</h3>
+    <div id="users"></div>
   </div>
 
-  <script src="/socket.io/socket.io.js"></script>
-  <script src="script.js"></script>
+  <div class="section">
+    <h3>Αιτήματα προς εσένα</h3>
+    <div id="requests"></div>
+  </div>
+
+  <script>
+    const currentUser = prompt("Ποιο είναι το όνομά σου;");
+
+    async function loadUsers() {
+      const res = await fetch('/users');
+      const users = await res.json();
+      const container = document.getElementById('users');
+      users.forEach(u => {
+        if (u !== currentUser) {
+          const div = document.createElement('div');
+          div.className = 'user-item';
+          div.innerHTML = `
+            <span>${u}</span>
+            <button onclick="sendRequest('${u}')">Αίτημα</button>
+          `;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    async function sendRequest(toUser) {
+      await fetch('/chat-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: currentUser, to: toUser })
+      });
+      alert("Αίτημα στάλθηκε!");
+    }
+
+    async function loadRequests() {
+      const res = await fetch('/chat_requests.json');
+      const requests = await res.json();
+      const container = document.getElementById('requests');
+      requests
+        .filter(r => r.to === currentUser && !r.accepted)
+        .forEach(r => {
+          const div = document.createElement('div');
+          div.className = 'user-item';
+          div.innerHTML = `
+            <span>${r.from}</span>
+            <button onclick="acceptRequest('${r.from}')">Αποδοχή</button>
+          `;
+          container.appendChild(div);
+        });
+    }
+
+    async function acceptRequest(fromUser) {
+      await fetch('/accept-request', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ from: fromUser, to: currentUser })
+      });
+      alert("Αποδέχθηκες! Μεταφέρεσαι στο chat...");
+      window.location = `/chat.html?user1=${currentUser}&user2=${fromUser}`;
+    }
+
+    loadUsers();
+    loadRequests();
+  </script>
 </body>
 </html>
