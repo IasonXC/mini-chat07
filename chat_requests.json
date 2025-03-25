@@ -1,1 +1,7 @@
-[]
+[
+  {
+    "from": "Eleni",
+    "to": "Jason",
+    "accepted": true
+  }
+]
