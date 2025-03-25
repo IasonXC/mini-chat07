@@ -9,6 +9,8 @@
 <body>
   <h1>🪽 Albatros Chat</h1>
 
+  <button onclick="logout()" style="float:right; margin: 10px;">Αποσύνδεση</button>
+
   <div class="section">
     <h3>Άλλοι χρήστες</h3>
     <div id="users"></div>
@@ -20,5 +22,56 @@
   </div>
 
   <script src="script.js"></script>
+  <script>
+    function logout() {
+      localStorage.removeItem('username');
+      window.location = 'login.html';
+    }
+
+    // Ενσωματώνουμε εμφάνιση τελευταίου μηνύματος
+    async function getLastMessage(user1, user2) {
+      const res = await fetch('/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user1, user2 })
+      });
+      const msgs = await res.json();
+      if (msgs.length > 0) {
+        const last = msgs[msgs.length - 1];
+        return last.text;
+      }
+      return '';
+    }
+
+    const username = localStorage.getItem('username');
+    if (username) {
+      const userContainer = document.getElementById('users');
+
+      fetch('/users')
+        .then(res => res.json())
+        .then(users => {
+          users.forEach(async u => {
+            if (u !== username) {
+              const lastMsg = await getLastMessage(username, u);
+              const div = document.createElement('div');
+              div.className = 'user-item';
+              div.innerHTML = `
+                <div>
+                  <strong>${u}</strong><br>
+                  <small>${lastMsg}</small>
+                </div>
+                <button onclick="sendRequest('${u}')">Αίτημα</button>
+              `;
+              userContainer.appendChild(div);
+            }
+          });
+        });
+
+      loadRequests();
+    } else {
+      alert("Δεν είσαι συνδεδεμένος!");
+      window.location = 'login.html';
+    }
+  </script>
 </body>
 </html>
