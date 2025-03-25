@@ -16,7 +16,6 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 const REQUESTS_FILE = path.join(__dirname, 'chat_requests.json');
 const MESSAGES_FILE = path.join(__dirname, 'messages.json');
 
-// Helpers
 function load(file) {
   return fs.existsSync(file) ? JSON.parse(fs.readFileSync(file)) : [];
 }
@@ -24,7 +23,6 @@ function save(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
 }
 
-// Register
 app.post('/register', async (req, res) => {
   const users = load(USERS_FILE);
   const { username, password } = req.body;
@@ -37,7 +35,6 @@ app.post('/register', async (req, res) => {
   res.send('Επιτυχής εγγραφή!');
 });
 
-// Login
 app.post('/login', async (req, res) => {
   const users = load(USERS_FILE);
   const { username, password } = req.body;
@@ -48,13 +45,11 @@ app.post('/login', async (req, res) => {
   res.send('Σύνδεση επιτυχής');
 });
 
-// Users
 app.get('/users', (req, res) => {
   const users = load(USERS_FILE).map(u => u.username);
   res.json(users);
 });
 
-// Chat requests
 app.post('/chat-request', (req, res) => {
   const { from, to } = req.body;
   const requests = load(REQUESTS_FILE);
@@ -74,7 +69,6 @@ app.post('/accept-request', (req, res) => {
   res.send('Αποδοχή αιτήματος');
 });
 
-// Fetch messages
 app.post('/messages', (req, res) => {
   const { user1, user2 } = req.body;
   const all = load(MESSAGES_FILE);
@@ -85,7 +79,6 @@ app.post('/messages', (req, res) => {
   res.json(msgs);
 });
 
-// Socket.io - real-time chat
 io.on('connection', (socket) => {
   socket.on('joinRoom', (roomId) => {
     socket.join(roomId);
