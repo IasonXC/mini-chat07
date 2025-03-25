@@ -51,7 +51,7 @@ async function acceptRequest(fromUser) {
   });
   alert("Αποδέχθηκες! Μεταφέρεσαι στο chat...");
   window.location = `/chat.html?user1=${currentUser}&user2=${fromUser}`;
-}
+} 
 
 loadUsers();
 loadRequests();
