@@ -1,12 +1,11 @@
 {
-  "name": "mini-chat",
-  "version": "1.0.0",
-  "description": "Απλό web-based chat app",
-  "main": "server.js",
+  "name": "albatros-chat",
+  "version": "1.2.0",
   "scripts": {
     "start": "node server.js"
   },
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "express": "^4.18.2",
     "socket.io": "^4.7.2"
   }
